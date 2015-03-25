@@ -1,0 +1,38 @@
+{
+    "name": "krak/svg",
+    "description": "A library used for manipulating and creating svg",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "http://gitlab.bighead.net/bighead/krak-svg",
+    "keywords": [
+        "svg",
+        "krak",
+        "exporter"
+    ],
+    "authors": [
+        {
+            "name": "RJ Garcia",
+            "email": "rj@bighead.net"
+        }
+    ],
+    "require": {
+        "php": "~5.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Krak\\Svg\\": "src"
+        },
+        "files": [
+            "src/iterators.php",
+            "src/Element/attribute_functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Krak\\Tests\\": "tests"
+        }
+    }
+}
