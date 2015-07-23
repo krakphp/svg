@@ -8,16 +8,12 @@ use Closure,
 class StringSvgSerializer implements SvgSerializer
 {
     private $show_doctype;
-    public function __construct($show_doctype = true)
+    private $indentation;
+
+    public function __construct($show_doctype = true, $indentation_level = 2)
     {
         $this->show_doctype = $show_doctype;
-    }
-
-    private function popStack(SplStack $stack)
-    {
-        $top = $stack->pop();
-        $depth = $stack->count();
-        return str_repeat('  ', $depth) . '</'.$top->getTagName().">\n";
+        $this->indentation = str_repeat(" ", $indentation_level);
     }
 
     private function getXmlHead()
@@ -34,45 +30,34 @@ class StringSvgSerializer implements SvgSerializer
 
     public function serializeSvg(Element\Svg $svg)
     {
-        $buf = $this->getXmlHead();
+        $start_buf = $this->getXmlHead();
+        $end_buf = '';
         $visitor = new Visitor\AttributeStringVisitor();
 
-        $stack = new SplStack();
-        $cur_depth = -1;
         $fmt = "%s<%s%s";
+        $end_fmt = "%s</%s>\n";
         foreach (krak_svg_iter_top_down($svg) as $depth => $el) {
-            while ($cur_depth >= $depth) {
-                $buf .= $this->popStack($stack);
-                $cur_depth--;
-            }
+            $ws_prefix = str_repeat($this->indentation, $depth);
 
-            $buf .= sprintf(
+            $start_buf .= sprintf(
                 $fmt,
-                str_repeat("  ", $depth),
+                $ws_prefix,
                 $el->getTagName(),
                 $visitor->visitElement($el)
             );
 
             if (count($el->getChildren())) {
-                $stack->push($el);
-                $buf .= ">\n";
-                $cur_depth = $depth;
+                $start_buf .= ">\n";
+                $end_buf = sprintf($end_fmt, $ws_prefix, $el->getTagName()) . $end_buf;
             }
             else if ($el->getTagName() == 'text' && $el->getText()) {
-                $buf .= ">" . $el->getText() . "</text>\n";
-                $cur_depth = $depth - 1;
+                $start_buf .= ">" . $el->getText() . "</text>\n";
             }
             else {
-                $buf .= "/>\n";
-                $cur_depth = $depth - 1; // this acts like we've just popped
+                $start_buf .= "/>\n";
             }
         }
 
-        /* pop the rest off the stack */
-        while (count($stack)) {
-            $buf .= $this->popStack($stack);
-        }
-
-        return $buf;
+        return $start_buf . $end_buf;
     }
 }
