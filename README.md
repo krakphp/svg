@@ -6,14 +6,8 @@ Krak Svg is a library for creating and exporting svg.
 
 ````json
 {
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "http://gitlab.bighead.net/bighead/krak-svg.git"
-        }
-    ],
     "require": {
-        "krak/svg": "~0.1"
+        "krak/svg": "^0.2"
     }
 }
 ````
@@ -45,12 +39,13 @@ $transform_attr->translate(30, 20);
 $group->getAttributes()->setAttribute($transform_attr);
 
 $rect = new Krak\Svg\Element\Rect();
-$rect->getAttributes()
-    ->setWidth(80)
-    ->setHeight(80)
-    ->setX(0)
-    ->setY(0)
-    ->setFill('#ffffff');
+$rect->setAttributes(krak\svg\element\attr_iter_to_col([
+        'width' => 80,
+        'height' => 80,
+        'x' => 0,
+        'y' => 0,
+        'fill' => '#ffffff',
+    ]));
 
 $group->appendChild($rect);
 
@@ -86,20 +81,21 @@ The StringSerializer will export the tree into svg tree.
 
 The RsvgCliSvgSerializer uses the `rsvg` command line utility to export an svg to a png, pdf, ps or any other format supported by rsvg. This serializer requires a string serializer thought to convert it to a string first.
 
-### Iterator an Svg Tree
+### Iteratoring an Svg Tree
 
 ````php
 <?php
-foreach (krak_svg_iter_top_down($svg) as $el) {
+foreach (krak\svg\iter_top_down($svg) as $depth => $el) {
     // ...
 }
-foreach (krak_svg_iter_bottom_up($svg) as $el) {
+foreach (krak\svg\iter_bottom_up($svg) as $depth => $el) {
     // ...
 }
-foreach (new Krak\Svg\TopDownIterator($svg) as $el) {
+/* the following are just aliases of what's above */
+foreach (new Krak\Svg\TopDownIterator($svg) as $depth => $el) {
     // ..
 }
-foreach (new Krak\Svg\BottomUpIterator($svg) as $el) {
+foreach (new Krak\Svg\BottomUpIterator($svg) as $depth => $el) {
     // ..
 }
 ````
@@ -121,6 +117,3 @@ Visitors and walkers are a way for modifying the svg tree before serializing it.
 
 - **AttributeString Visitor**: Converts an elements attributes into a string
 - **HeightCalculator Visitor**: Calculates the height of an svg element by summing the height of all of it's child elements. It only applies height calculation on elements with the query hint of `Krak\Svg\Visitor\HeightCalculatorVisitor::HINT` value.
-
-
-
