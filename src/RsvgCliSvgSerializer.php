@@ -11,7 +11,7 @@ class RsvgCliSvgSerializer implements SvgSerializer
     private $serializer;
     private $type;
 
-    public function __construct(SvgSerializer $serializer, $type = self::PNG)
+    public function __construct($serializer, $type = self::PNG)
     {
         $this->serializer = $serializer;
         $this->type = $type;
@@ -19,23 +19,17 @@ class RsvgCliSvgSerializer implements SvgSerializer
 
     public function serializeSvg(Element\Svg $svg)
     {
-        $svg_data = $this->serializer->serializeSvg($svg);
+        $svg_data = serialize_svg($this->serializer, $svg);
         $fmt = 'rsvg-convert --format=%s';
         return $this->pipeCommand($svg_data, sprintf($fmt, $this->type));
     }
 
     private function pipeCommand($data, $cmd)
     {
-        $descriptorspec = array(
-           0 => array("pipe", "r"),
-           1 => array("pipe", "w")
-        );
-
         $pipes = [];
-        $process = proc_open($cmd, $descriptorspec, $pipes);
+        $process = proc_open($cmd, [["pipe", "r"],["pipe", "w"],], $pipes);
 
         if (!is_resource($process)) {
-            $this->logger->debug('process was not a resource...');
             return '';
         }
 

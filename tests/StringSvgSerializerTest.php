@@ -1,9 +1,8 @@
 <?php
 
-namespace Krak\Tests;
+namespace Krak\Svg\Tests;
 
-use Krak\Svg,
-    Krak\Tests\TestCase;
+use Krak\Svg;
 
 class StringSvgSerializerTest extends TestCase
 {

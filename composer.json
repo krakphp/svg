@@ -25,14 +25,11 @@
         "psr-4": {
             "Krak\\Svg\\": "src"
         },
-        "files": [
-            "src/iterators.php",
-            "src/Element/attribute_functions.php"
-        ]
+        "files": ["src/inc.php"]
     },
     "autoload-dev": {
         "psr-4": {
-            "Krak\\Tests\\": "tests"
+            "Krak\\Svg\\Tests\\": "tests"
         }
     }
 }

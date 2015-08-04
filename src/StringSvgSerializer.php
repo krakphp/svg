@@ -34,7 +34,7 @@ class StringSvgSerializer implements SvgSerializer
         $end_buf = '';
         $visitor = new Visitor\AttributeStringVisitor();
 
-        $fmt = "%s<%s%s";
+        $fmt = "%s<%s";
         $end_fmt = "%s</%s>\n";
         foreach (krak_svg_iter_top_down($svg) as $depth => $el) {
             $ws_prefix = str_repeat($this->indentation, $depth);
@@ -42,9 +42,13 @@ class StringSvgSerializer implements SvgSerializer
             $start_buf .= sprintf(
                 $fmt,
                 $ws_prefix,
-                $el->getTagName(),
-                $visitor->visitElement($el)
+                $el->getTagName()
             );
+
+            $attrs = $visitor->visitElement($el);
+            if ($attrs) {
+                $start_buf .= ' ' . $attrs;
+            }
 
             if (count($el->getChildren())) {
                 $start_buf .= ">\n";

@@ -13,6 +13,6 @@ class TopDownIterator implements \IteratorAggregate
 
     public function getIterator()
     {
-        return krak_svg_iter_top_down($this->root);
+        return iter_top_down($this->root);
     }
 }

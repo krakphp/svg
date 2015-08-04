@@ -13,6 +13,6 @@ class BottomUpIterator implements \IteratorAggregate
 
     public function getIterator()
     {
-        return krak_svg_iter_bottom_up($this->root);
+        return iter_bottom_up($this->root);
     }
 }
