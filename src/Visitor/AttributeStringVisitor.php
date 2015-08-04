@@ -2,7 +2,8 @@
 
 namespace Krak\Svg\Visitor;
 
-use Krak\Svg\Element;
+use Krak\Svg\Element,
+    Krak\Svg\StringUtil;
 
 /**
  * Output attributes as string
@@ -23,11 +24,9 @@ class AttributeStringVisitor implements SvgVisitor
 
     public function visitElement(Element\AbstractElement $element)
     {
-        $buf = '';
-        foreach ($element->getAttributes() as $attr) {
-            $buf .= $this->getAttributeString($attr);
-        }
-
-        return $buf;
+        return stringutil\map_join($element->getAttributes(), ' ', function($attr)
+        {
+            return $this->getAttributeString($attr);
+        });
     }
 }
