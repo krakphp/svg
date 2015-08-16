@@ -2,7 +2,7 @@
 
 namespace Krak\Svg;
 
-function serialize_svg($serializer, AbstractElement $root)
+function serialize_svg($serializer, Element\AbstractElement $root)
 {
     if ($serializer instanceof SvgSerializer) {
         return $serializer->serializeSvg($root);
