@@ -30,38 +30,51 @@ class StringSvgSerializer implements SvgSerializer
 
     public function serializeSvg(Element\Svg $svg)
     {
-        $start_buf = $this->getXmlHead();
-        $end_buf = '';
+        $buf = $this->getXmlHead();
         $visitor = new Visitor\AttributeStringVisitor();
 
-        $fmt = "%s<%s";
-        $end_fmt = "%s</%s>\n";
+        $stack = new \SplStack();
+        $last_depth = 0;
         foreach (krak_svg_iter_top_down($svg) as $depth => $el) {
             $ws_prefix = str_repeat($this->indentation, $depth);
 
-            $start_buf .= sprintf(
-                $fmt,
-                $ws_prefix,
-                $el->getTagName()
-            );
+            // close tags
+            while ($depth < $last_depth) {
+                list($_depth, $el) = $stack->pop();
+                $buf .= $this->indent($_depth, "</".$el->getTagName().">\n");
+                $last_depth = $_depth;
+            }
+
+            $last_depth = $depth;
+
+            $buf .= $this->indent($depth, "<".$el->getTagName());
 
             $attrs = $visitor->visitElement($el);
             if ($attrs) {
-                $start_buf .= ' ' . $attrs;
+                $buf .= ' ' . $attrs;
             }
 
             if (count($el->getChildren())) {
-                $start_buf .= ">\n";
-                $end_buf = sprintf($end_fmt, $ws_prefix, $el->getTagName()) . $end_buf;
+                $buf .= ">\n";
+                $stack->push([$depth, $el]);
             }
             else if ($el->getTagName() == 'text' && $el->getText()) {
-                $start_buf .= ">" . $el->getText() . "</text>\n";
+                $buf .= ">" . $el->getText() . "</text>\n";
             }
             else {
-                $start_buf .= "/>\n";
+                $buf .= "/>\n";
             }
         }
 
-        return $start_buf . $end_buf;
+        while ($stack->count()) {
+            list($depth, $el) = $stack->pop();
+            $buf .= $this->indent($depth, "</".$el->getTagName().">\n");
+        }
+
+        return $buf;
+    }
+
+    private function indent($depth, $str) {
+        return str_repeat($this->indentation, $depth) . $str;
     }
 }
