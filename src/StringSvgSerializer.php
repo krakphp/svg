@@ -40,7 +40,7 @@ class StringSvgSerializer implements SvgSerializer
 
             // close tags
             while ($depth < $last_depth) {
-                list($_depth, $el) = $stack->pop();
+                list($_depth, $_el) = $stack->pop();
                 $buf .= $this->indent($_depth, "</".$el->getTagName().">\n");
                 $last_depth = $_depth;
             }
@@ -60,6 +60,9 @@ class StringSvgSerializer implements SvgSerializer
             }
             else if ($el->getTagName() == 'text' && $el->getText()) {
                 $buf .= ">" . $el->getText() . "</text>\n";
+            }
+            else if ($el->getTagName() == 'defs') {
+                $buf .= ">" . $el->getContent() . "</defs>\n";
             }
             else {
                 $buf .= "/>\n";
